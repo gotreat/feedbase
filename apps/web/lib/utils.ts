@@ -8,7 +8,11 @@ export function isSlugValid(slug: string) {
 }
 
 export function formatRootUrl(subdomain?: string, path?: string) {
-  const protocol = process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? 'https' : 'http';
+  const isProd =
+    process.env.NODE_ENV === 'production' &&
+    !!process.env.NEXT_PUBLIC_ROOT_DOMAIN &&
+    !process.env.NEXT_PUBLIC_ROOT_DOMAIN.includes('localhost');
+  const protocol = isProd ? 'https' : 'http';
 
   return `${protocol}://${subdomain ? `${subdomain}.` : ''}${process.env.NEXT_PUBLIC_ROOT_DOMAIN}${
     path ? path : ''
