@@ -12,13 +12,16 @@ export function UserAuthForm({
   authType,
   successRedirect,
   buttonsClassname,
+  providers,
 }: {
   authType: 'sign-in' | 'sign-up';
   successRedirect?: string;
   buttonsClassname?: string;
+  providers?: Array<'email' | 'github' | 'google'>;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [provider, setProvider] = useState<'github' | 'email'>('github');
+  const enabledProviders = providers ?? ['email', 'github'];
+  const [provider, setProvider] = useState<'github' | 'email' | 'google'>(enabledProviders[0] ?? 'email');
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   // TODO: Figure out issue with cookieOptions setting and set at root level instead of individually like rn
@@ -85,14 +88,14 @@ export function UserAuthForm({
     setIsLoading(false);
   }
 
-  async function handleGitHubSignIn(event: React.SyntheticEvent) {
+  async function handleOAuthSignIn(event: React.SyntheticEvent, oauthProvider: 'github' | 'google') {
     setIsLoading(true);
 
     event.preventDefault();
-    setProvider('github');
+    setProvider(oauthProvider);
 
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'github',
+      provider: oauthProvider,
       options: {
         redirectTo: `${location.origin}/auth/callback?successRedirect=${successRedirect || location.origin}`,
       },
@@ -105,76 +108,100 @@ export function UserAuthForm({
 
   return (
     <div className='grid gap-4'>
-      <form onSubmit={handleMailSignIn}>
-        <div className='grid gap-3'>
-          <div className='gap- grid gap-2'>
-            {authType === 'sign-up' && (
-              <>
-                <Label className='sr-only' htmlFor='email'>
-                  Full Name
-                </Label>
-                <Input
-                  id='name'
-                  placeholder='Full Name'
-                  type='name'
-                  autoCapitalize='none'
-                  autoComplete='name'
-                  autoCorrect='off'
-                  disabled={isLoading}
-                  onChange={(event) => {
-                    setName(event.currentTarget.value);
-                  }}
-                  className={buttonsClassname}
-                />
-              </>
-            )}
+      {enabledProviders.includes('email') && (
+        <form onSubmit={handleMailSignIn}>
+          <div className='grid gap-3'>
+            <div className='gap- grid gap-2'>
+              {authType === 'sign-up' && (
+                <>
+                  <Label className='sr-only' htmlFor='email'>
+                    Full Name
+                  </Label>
+                  <Input
+                    id='name'
+                    placeholder='Full Name'
+                    type='name'
+                    autoCapitalize='none'
+                    autoComplete='name'
+                    autoCorrect='off'
+                    disabled={isLoading}
+                    onChange={(event) => {
+                      setName(event.currentTarget.value);
+                    }}
+                    className={buttonsClassname}
+                  />
+                </>
+              )}
 
-            <Label className='sr-only' htmlFor='email'>
-              Email
-            </Label>
-            <Input
-              id='email'
-              placeholder='name@example.com'
-              type='email'
-              autoCapitalize='none'
-              autoComplete='email'
-              autoCorrect='off'
-              disabled={isLoading}
-              onChange={(event) => {
-                setEmail(event.currentTarget.value);
-              }}
-              className={buttonsClassname}
-            />
+              <Label className='sr-only' htmlFor='email'>
+                Email
+              </Label>
+              <Input
+                id='email'
+                placeholder='name@example.com'
+                type='email'
+                autoCapitalize='none'
+                autoComplete='email'
+                autoCorrect='off'
+                disabled={isLoading}
+                onChange={(event) => {
+                  setEmail(event.currentTarget.value);
+                }}
+                className={buttonsClassname}
+              />
+            </div>
+            <Button disabled={isLoading}>
+              {isLoading && provider === 'email' ? (
+                <Icons.Spinner className='mr-2 h-4 w-4 animate-spin' />
+              ) : null}
+              Continue with Email
+            </Button>
           </div>
-          <Button disabled={isLoading}>
-            {isLoading && provider === 'email' ? (
-              <Icons.Spinner className='mr-2 h-4 w-4 animate-spin' />
-            ) : null}
-            Continue with Email
-          </Button>
+        </form>
+      )}
+
+      {enabledProviders.includes('email') && (enabledProviders.includes('github') || enabledProviders.includes('google')) && (
+        <div className='relative'>
+          <div className='absolute inset-0 flex items-center'>
+            <span className='w-full border-t' />
+          </div>
+          <div className='relative flex justify-center text-xs uppercase'>
+            <span className='bg-root text-muted-foreground px-2'>Or continue with</span>
+          </div>
         </div>
-      </form>
-      <div className='relative'>
-        <div className='absolute inset-0 flex items-center'>
-          <span className='w-full border-t' />
-        </div>
-        <div className='relative flex justify-center text-xs uppercase'>
-          <span className='bg-root text-muted-foreground px-2'>Or continue with</span>
-        </div>
-      </div>
-      <Button
-        variant='outline'
-        type='button'
-        disabled={isLoading}
-        onClick={handleGitHubSignIn}
-        className={buttonsClassname}>
-        {isLoading && provider === 'github' ? (
-          <Icons.Spinner className='mr-2 h-4 w-4 animate-spin' />
-        ) : (
-          <Icons.Github className='mr-2 h-4 w-4' />
-        )}{' '}
-        Github
-      </Button>
+      )}
+
+      {enabledProviders.includes('google') && (
+        <Button
+          variant='outline'
+          type='button'
+          disabled={isLoading}
+          onClick={(event) => handleOAuthSignIn(event, 'google')}
+          className={buttonsClassname}>
+          {isLoading && provider === 'google' ? (
+            <Icons.Spinner className='mr-2 h-4 w-4 animate-spin' />
+          ) : (
+            <Icons.Google className='mr-2 h-4 w-4' />
+          )}{' '}
+          Google
+        </Button>
+      )}
+
+      {enabledProviders.includes('github') && (
+        <Button
+          variant='outline'
+          type='button'
+          disabled={isLoading}
+          onClick={(event) => handleOAuthSignIn(event, 'github')}
+          className={buttonsClassname}>
+          {isLoading && provider === 'github' ? (
+            <Icons.Spinner className='mr-2 h-4 w-4 animate-spin' />
+          ) : (
+            <Icons.Github className='mr-2 h-4 w-4' />
+          )}{' '}
+          Github
+        </Button>
+      )}
     </div>
   );
 }

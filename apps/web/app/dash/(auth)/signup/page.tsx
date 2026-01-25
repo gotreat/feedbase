@@ -42,11 +42,11 @@ export default async function SignUp() {
         <CardHeader className='flex flex-col items-center space-y-2'>
           <CardTitle>Sign up</CardTitle>
           <CardDescription className='text-center'>
-            Sign up with your email address to continue.
+            Sign up with Google to continue.
           </CardDescription>
         </CardHeader>
         <CardContent className='px-2'>
-          <UserAuthForm authType='sign-up' />
+          <UserAuthForm authType='sign-up' providers={['google']} />
         </CardContent>
         <CardFooter className='flex flex-col items-center'>
           <CardDescription className='text-center'>
