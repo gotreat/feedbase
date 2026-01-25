@@ -2,11 +2,11 @@
 FROM node:18-alpine AS alpine
 
 # setup pnpm on the alpine base
-FROM alpine as base
+FROM alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
-RUN pnpm install turbo --global
+RUN pnpm install turbo@1.10.14 --global
 RUN apk add --update python3 make g++ && rm -rf /var/cache/apk/*
 
 FROM base AS builder
