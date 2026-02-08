@@ -55,7 +55,9 @@ export default async function HubLayout({ children, params }: Props) {
   const headerList = headers();
   const pathname = headerList.get('x-pathname');
   const hostname = headerList.get('host');
-  const currentTab = tabs.find((tab) => tab.link === `/${pathname!.split('/')[1]}`);
+  const pathnameRoot = pathname?.split('/')[1] ?? 'feedback';
+  const tabsForRequest = [...tabs];
+  const currentTab = tabsForRequest.find((tab) => tab.link === `/${pathnameRoot}`);
 
   if (!currentTab) {
     redirect('/feedback');
@@ -82,7 +84,7 @@ export default async function HubLayout({ children, params }: Props) {
 
   // Check if any modules are disabled and remove them from the tabs
   if (!config.changelog_enabled) {
-    tabs.splice(1, 1);
+    tabsForRequest.splice(1, 1);
   }
 
   // Get current user
@@ -98,7 +100,7 @@ export default async function HubLayout({ children, params }: Props) {
         {/* Header */}
         <div className='flex h-full w-full flex-col items-center pt-5'>
           {/* Header */}
-          <Header tabs={tabs} intialTab={currentTab} project={project} user={user} config={config} />
+          <Header tabs={tabsForRequest} intialTab={currentTab} project={project} user={user} config={config} />
 
           {/* Separator with max screen width */}
           <Separator className='bg-border/60' />

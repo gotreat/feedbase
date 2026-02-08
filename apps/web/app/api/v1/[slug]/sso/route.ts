@@ -103,5 +103,6 @@ export async function GET(req: NextRequest, context: { params: { slug: string } 
     }
   );
 
-  return NextResponse.redirect(redirectTo, { status: 302 });
+  const redirectUrl = new URL(redirectTo, req.nextUrl.origin);
+  return NextResponse.redirect(redirectUrl, { status: 302 });
 }

@@ -6,7 +6,7 @@
     "dev": "next dev",
     "dev:email": "email dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node .next/standalone/server.js",
     "lint": "eslint .",
     "ts": "tsc --noEmit"
   },
