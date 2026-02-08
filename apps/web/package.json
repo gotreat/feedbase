@@ -6,7 +6,7 @@
     "dev": "next dev",
     "dev:email": "email dev",
     "build": "next build",
-    "start": "node .next/standalone/server.js",
+    "start": "sh -c 'SERVER=$(find .next/standalone -type f -name server.js 2>/dev/null | head -n 1); if [ -z \"$SERVER\" ]; then echo \"Missing standalone server.js. Did the build run?\"; exit 1; fi; node \"$SERVER\"'",
     "lint": "eslint .",
     "ts": "tsc --noEmit"
   },
