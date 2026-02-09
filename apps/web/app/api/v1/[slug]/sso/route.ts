@@ -111,6 +111,9 @@ export async function GET(req: NextRequest, context: { params: { slug: string } 
     }
   );
 
-  const redirectUrl = new URL(redirectTo, req.nextUrl.origin);
+  const origin = process.env.RAILWAY_PUBLIC_DOMAIN
+    ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
+    : req.nextUrl.origin;
+  const redirectUrl = new URL(redirectTo, origin);
   return NextResponse.redirect(redirectUrl, { status: 302 });
 }
