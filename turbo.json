@@ -18,7 +18,8 @@
     "TINYBIRD_API_KEY",
     "VERCEL",
     "CUSTOM_DOMAIN_WHITELIST",
-    "NODE_ENV"
+    "NODE_ENV",
+    "RAILWAY_PUBLIC_DOMAIN"
   ],
   "pipeline": {
     "build": {
