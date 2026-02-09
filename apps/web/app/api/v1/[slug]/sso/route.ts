@@ -12,6 +12,10 @@ export async function GET(req: NextRequest, context: { params: { slug: string } 
     return NextResponse.json({ error: 'Missing redirect_to or jwt param' }, { status: 400 });
   }
 
+  if (!redirectTo.startsWith('/')) {
+    return NextResponse.json({ error: 'Invalid redirect_to' }, { status: 400 });
+  }
+
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return NextResponse.json({ error: 'Missing SUPABASE_SERVICE_ROLE_KEY env variable' }, { status: 500 });
   }
@@ -28,6 +32,10 @@ export async function GET(req: NextRequest, context: { params: { slug: string } 
 
   if (projectError) {
     return NextResponse.json(projectError, { status: 500 });
+  }
+
+  if (!project) {
+    return NextResponse.json({ error: 'Project not found' }, { status: 404 });
   }
 
   // Get projects jwt secret
